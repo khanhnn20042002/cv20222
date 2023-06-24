@@ -1,0 +1,51 @@
+import streamlit as st
+from PIL import Image
+import tensorflow
+from tensorflow.keras.preprocessing.image import img_to_array, load_img
+import style
+import numpy as np
+
+st.title("Pytorch Style Transfer")
+
+img = st.sidebar.selectbox(
+    'Select image',
+    ('cat.jpg','picasso.jpg')
+)
+
+style_name = st.sidebar.selectbox(
+    'Select Style',
+    ('mosaic','rain_princess','udnie','wave')
+)
+
+input_image = img
+st.write("### Source image:")
+image = Image.open(input_image)
+st.image(image,width=350)
+
+clicked = st.button("Stylize")
+
+
+
+def get_image(img_path):
+  img = load_img(img_path)
+  img = img_to_array(img, dtype=np.float32)
+  return img
+def post_process(img):
+  img = tensorflow.clip_by_value(img, 0, 255)
+  img = img.numpy()
+  img = tensorflow.squeeze(img)
+  img = img.numpy()
+  img = img.astype(int)
+  return img
+
+if clicked:
+    model = tensorflow.keras.models.load_model("style/"+style_name+"/"+style_name+"/saved_models")
+    img = get_image(img)
+    img_tensor = tensorflow.convert_to_tensor(img)
+    img_tensor = tensorflow.expand_dims(img_tensor, 0)
+    output = model(img_tensor)
+    st.write("### Output image:")
+    output_array = output.numpy()
+    output_img = Image.fromarray(np.uint8(output_array[0]))
+    st.image(output_img, width=350)
+
