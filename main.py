@@ -7,24 +7,12 @@ import numpy as np
 
 st.title("Pytorch Style Transfer")
 
-img = st.sidebar.selectbox(
-    'Select image',
-    ('cat.jpg','picasso.jpg')
-)
+img = st.sidebar.file_uploader("Upload Custom Image", type=["jpg", "JPEG", "png"])
 
 style_name = st.sidebar.selectbox(
     'Select Style',
     ('mosaic','rain_princess','udnie','wave')
 )
-
-input_image = img
-st.write("### Source image:")
-image = Image.open(input_image)
-st.image(image,width=350)
-
-clicked = st.button("Stylize")
-
-
 
 def get_image(img_path):
   img = load_img(img_path)
@@ -38,7 +26,14 @@ def post_process(img):
   img = img.astype(int)
   return img
 
-if clicked:
+#main
+if img is not None:
+  input_image = img
+  st.write("### Source image:")
+  image = Image.open(input_image)
+  st.image(image,width=350)
+  clicked = st.button("Stylize")
+  if clicked:
     model = tensorflow.keras.models.load_model("style/"+style_name+"/"+style_name+"/saved_models")
     img = get_image(img)
     img_tensor = tensorflow.convert_to_tensor(img)
@@ -48,4 +43,6 @@ if clicked:
     output_array = output.numpy()
     output_img = Image.fromarray(np.uint8(output_array[0]))
     st.image(output_img, width=350)
+else:
+  st.subheader('Please upload an image!')
 
