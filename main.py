@@ -5,13 +5,13 @@ from tensorflow.keras.preprocessing.image import img_to_array, load_img
 import style
 import numpy as np
 
-st.title("Pytorch Style Transfer")
+st.title("Style Transfer")
 
 img = st.sidebar.file_uploader("Upload Custom Image", type=["jpg", "JPEG", "png"])
 
 style_name = st.sidebar.selectbox(
     'Select Style',
-    ('mosaic','rain_princess','udnie','wave')
+    ('mosaic','autumn','udnie','wave')
 )
 
 def get_image(img_path):
@@ -31,10 +31,13 @@ if img is not None:
   input_image = img
   st.write("### Source image:")
   image = Image.open(input_image)
-  st.image(image,width=350)
+  st.image(image,width=500)
   clicked = st.button("Stylize")
   if clicked:
-    model = tensorflow.keras.models.load_model("style/"+style_name+"/"+style_name+"/saved_models")
+    if style_name != "autumn":
+      model = tensorflow.keras.models.load_model("style/"+style_name+"/"+style_name+"/saved_models")
+    elif style_name == "autumn":
+      model = tensorflow.keras.models.load_model("style/"+"rain_princess"+"/"+"rain_princess"+"/saved_models")
     img = get_image(img)
     img_tensor = tensorflow.convert_to_tensor(img)
     img_tensor = tensorflow.expand_dims(img_tensor, 0)
@@ -45,4 +48,3 @@ if img is not None:
     st.image(output_img, width=350)
 else:
   st.subheader('Please upload an image!')
-
